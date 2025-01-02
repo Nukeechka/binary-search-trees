@@ -4,15 +4,11 @@ require_relative 'node'
 
 # class Tree
 class Tree
-  attr_accessor :root
+  attr_reader :root, :array
 
   def initialize(array)
     @array = array.uniq!.sort!
     @root = root_set(array)
-  end
-
-  def root_set(array)
-    build_tree(array, 0, array.length - 1)
   end
 
   def build_tree(array, index_start, index_end)
@@ -47,12 +43,6 @@ class Tree
     root
   end
 
-  def get_succesor(current)
-    current = current.right
-    current = current.left while !current.nil? && !current.left.nil?
-    current
-  end
-
   def delete(value, root = @root) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     return root if root.nil?
 
@@ -70,5 +60,57 @@ class Tree
       root.right = delete(successor.data, root.right)
     end
     root
+  end
+
+  def find(value, root = @root)
+    return nil if root.nil?
+
+    return root if root.data == value
+
+    if root.data < value
+      root.right = find(value, root.right)
+    else
+      root.left = find(value, root.left)
+    end
+  end
+
+  def level_order # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+    return nil if @root.nil?
+
+    return @array unless block_given?
+
+    temp = []
+    result = []
+    q = []
+    q.push(@root)
+    temp.push(@root)
+    until q.empty?
+      current = q.first
+      unless current.left.nil?
+        q.push(current.left)
+        temp.push(current.left)
+      end
+      unless current.right.nil?
+        q.push(current.right)
+        temp.push(current.right)
+      end
+      q.shift
+    end
+    temp.each do |node|
+      result << yield(node)
+    end
+    result
+  end
+
+  private
+
+  def root_set(array)
+    build_tree(array, 0, array.length - 1)
+  end
+
+  def get_succesor(current)
+    current = current.right
+    current = current.left while !current.nil? && !current.left.nil?
+    current
   end
 end
