@@ -3,12 +3,13 @@
 require_relative 'node'
 
 # class Tree
-class Tree
+class Tree # rubocop:disable Metrics/ClassLength
   attr_reader :root, :array
 
   def initialize(array)
     @array = array.uniq!.sort!
     @root = root_set(array)
+    @temp_results = []
   end
 
   def build_tree(array, index_start, index_end)
@@ -102,7 +103,27 @@ class Tree
     result
   end
 
+  def preorder
+    return @array unless block_given?
+
+    result = []
+
+    preorder_traversal
+    @temp_results.each do |data|
+      result << yield(data)
+    end
+    result
+  end
+
   private
+
+  def preorder_traversal(root = @root)
+    return if root.nil?
+
+    @temp_results << root.data
+    preorder_traversal(root.left)
+    preorder_traversal(root.right)
+  end
 
   def root_set(array)
     build_tree(array, 0, array.length - 1)
