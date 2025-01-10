@@ -107,11 +107,35 @@ class Tree # rubocop:disable Metrics/ClassLength
     return @array unless block_given?
 
     result = []
-
     preorder_traversal
     @temp_results.each do |data|
       result << yield(data)
     end
+    @temp_results = []
+    result
+  end
+
+  def inorder
+    return @array unless block_given?
+
+    result = []
+    inorder_traversal
+    @temp_results.each do |data|
+      result << yield(data)
+    end
+    @temp_results = []
+    result
+  end
+
+  def postorder
+    return @array unless block_given?
+
+    result = []
+    postorder_traversal
+    @temp_results.each do |data|
+      result << yield(data)
+    end
+    @temp_results = []
     result
   end
 
@@ -123,6 +147,22 @@ class Tree # rubocop:disable Metrics/ClassLength
     @temp_results << root.data
     preorder_traversal(root.left)
     preorder_traversal(root.right)
+  end
+
+  def inorder_traversal(root = @root)
+    return if root.nil?
+
+    inorder_traversal(root.left)
+    @temp_results << root.data
+    inorder_traversal(root.right)
+  end
+
+  def postorder_traversal(root = @root)
+    return if root.nil?
+
+    postorder_traversal(root.left)
+    postorder_traversal(root.right)
+    @temp_results << root.data
   end
 
   def root_set(array)
