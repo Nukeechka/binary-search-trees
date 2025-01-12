@@ -69,9 +69,9 @@ class Tree # rubocop:disable Metrics/ClassLength
     return root if root.data == value
 
     if root.data < value
-      root.right = find(value, root.right)
+      find(value, root.right)
     else
-      root.left = find(value, root.left)
+      find(value, root.left)
     end
   end
 
@@ -137,6 +137,31 @@ class Tree # rubocop:disable Metrics/ClassLength
     end
     @temp_results = []
     result
+  end
+
+  def height(root)
+    return if @root.nil?
+    return -1 if root.nil?
+
+    left_height = height(root.left)
+    right_height = height(root.right)
+    [left_height, right_height].max + 1
+  end
+
+  def depth(node, root = @root)
+    return -1 if root.nil?
+
+    dist = -1
+
+    return dist + 1 if root.data == node.data
+
+    dist = depth(node, root.left)
+    return dist + 1 if dist >= 0
+
+    dist = depth(node, root.right)
+    return dist + 1 if dist >= 0
+
+    dist
   end
 
   private
