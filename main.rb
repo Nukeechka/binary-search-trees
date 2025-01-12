@@ -2,6 +2,12 @@
 
 require_relative 'lib/tree'
 
-test = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-
+array = Array.new(15) { rand(1..100) }
+test = Tree.new(array)
+test.insert(124)
+test.insert(125)
 test.pretty_print
+p test.balanced?
+test.rebalance
+test.pretty_print
+p test.balanced?

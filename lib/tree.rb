@@ -78,8 +78,6 @@ class Tree # rubocop:disable Metrics/ClassLength
   def level_order # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     return nil if @root.nil?
 
-    return @array unless block_given?
-
     temp = []
     result = []
     q = []
@@ -97,6 +95,8 @@ class Tree # rubocop:disable Metrics/ClassLength
       end
       q.shift
     end
+    return temp unless block_given?
+
     temp.each do |node|
       result << yield(node)
     end
@@ -104,10 +104,10 @@ class Tree # rubocop:disable Metrics/ClassLength
   end
 
   def preorder
-    return @array unless block_given?
-
     result = []
     preorder_traversal
+    return @temp_results unless block_given?
+
     @temp_results.each do |data|
       result << yield(data)
     end
@@ -116,10 +116,10 @@ class Tree # rubocop:disable Metrics/ClassLength
   end
 
   def inorder
-    return @array unless block_given?
-
     result = []
     inorder_traversal
+    return @temp_results unless block_given?
+
     @temp_results.each do |data|
       result << yield(data)
     end
@@ -128,10 +128,10 @@ class Tree # rubocop:disable Metrics/ClassLength
   end
 
   def postorder
-    return @array unless block_given?
-
     result = []
     postorder_traversal
+    return @temp_results unless block_given?
+
     @temp_results.each do |data|
       result << yield(data)
     end
@@ -164,7 +164,33 @@ class Tree # rubocop:disable Metrics/ClassLength
     dist
   end
 
+  def balanced?
+    result = balanced_handler
+    return false if result == -1
+
+    true
+  end
+
+  def rebalance
+    current_array = inorder.sort!
+    @root = root_set(current_array)
+  end
+
   private
+
+  def balanced_handler(root = @root)
+    return 0 if root.nil?
+
+    left = balanced_handler(root.left)
+    return -1 if left == -1
+
+    right = balanced_handler(root.right)
+    return -1 if right == -1
+
+    return -1 if (left - right).abs > 1
+
+    [left, right].max + 1
+  end
 
   def preorder_traversal(root = @root)
     return if root.nil?
